@@ -68,11 +68,9 @@ public class BoundingBox {
 	 */
 	public BoundingBox displaced(Vector2D d) {
 		// TODO: Implement me.
-		lower.x = lower.x + d.x;
-		lower.y = lower.y + d.y;
-		upper.x = upper.x + d.x;
-		upper.y = upper.y + d.y;
-		return new cs2110.collision.BoundingBox(lower, upper);
+		Vector2D newLower = new Vector2D(lower.x + d.x, lower.y + d.y);
+		Vector2D newUpper = new Vector2D(upper.x + d.x, upper.y + d.y);
+		return new BoundingBox(newLower, newUpper);
 	}
 
 	/** Return true iff this bounding box contains p.

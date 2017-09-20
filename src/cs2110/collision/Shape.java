@@ -95,8 +95,8 @@ public class Shape {
 	 */
 	boolean overlaps(Shape t) {
 		// TODO: Use betterOverlaps when you implement it.
-		// return betterOverlaps(t);
-		return naiveOverlaps(t);
+		 return betterOverlaps(t);
+		// return naiveOverlaps(t);
 	}
 
 	/** Return true iff this shape overlaps with shape t.
@@ -123,7 +123,7 @@ public class Shape {
 	 */
 	boolean betterOverlaps(Shape t) {
 		// TODO: Implement me.
-		return false;
+		return tree.overlaps(d, t.tree, t.d);
 	}
 
 	/** "Clear" the shape from displacement and turned on flags. */
@@ -182,14 +182,15 @@ public class Shape {
 	 */
 	public boolean contains(Vector2D p) {
 		// TODO: Use betterContains when you implement it.
-		// return betterContains(p);
-		return naiveContains(p);
+		return betterContains(p);
+		// return naiveContains(p);
 	}
 
 	/** Return true iff this shape contains point p.
 	 * @param p A point.
 	 * @return True iff this shape contains the point p.
 	 */
+	@SuppressWarnings("unused")
 	private boolean naiveContains(Vector2D p) {
 		// Account for displacement of shape.
 		Vector2D newP = p.minus(d);
@@ -205,13 +206,21 @@ public class Shape {
 	 * @param p A point.
 	 * @return True iff this shape contains the point p.
 	 */
-	@SuppressWarnings("unused") // When implemented, move this tag to naiveContains
+	// When implemented, move this tag to naiveContains
 	private boolean betterContains(Vector2D p) {
 		// TODO: Implement me
-
 		// NOTE: Do not forget to account for the displacement of this shape!
 
-		return false;
-	}
-
+		Vector2D pNew =  new Vector2D(p.x - d.x,  p.y - d.y);
+		//BoundingBox newBox = this.tree.getBox().displaced(dNew);
+		return tree.contains(pNew);
+//		if (tree.isLeaf()) {
+//			return p.x >= tree.getBox().lower.x && p.x <= tree.getBox().upper.x && p.y >= tree.getBox().lower.y && p.y <= tree.getBox().upper.y;
+//		}
+//		else {
+//			if (p.x >= tree.getBox().lower.x && p.x <= tree.getBox().upper.x && p.y >= tree.getBox().lower.y && p.y <= tree.getBox().upper.y) {
+//				return tree.left.betterContains(p) || tree.right.betterContains(p);
+//			}
+//			else { return false;}
+		}
 }

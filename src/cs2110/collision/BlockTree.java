@@ -64,14 +64,43 @@ public class BlockTree {
 		}
 
 		// Create binary tree
+
+//		if (left == null){
+//			if (leftList.size() > 1) {
+//				numBlocks = leftList.size();
+//				left = new BlockTree(leftList);
+//				block = null;
+//			}
+//			else {
+//				numBlocks = 1;
+//				left = null;
+//				right = null;
+//				block = leftList.get(0);
+//			}
+//		}
+//		if (right == null){
+//			if (rightList.size() > 1){
+//				numBlocks = rightList.size();
+//				right = new BlockTree(rightList);
+//				block = null;
+//			}
+//			else {
+//				numBlocks = 1;
+//				left = null;
+//				right = null;
+//				block = rightList.get(0);
+//			}
+//		}
+
 		if (leftList.size() > 1){
 			numBlocks = leftList.size();
+			System.out.println("left numblocks: " + numBlocks);
 			left = new BlockTree(leftList);
-//			right = new BlockTree(rightList);
 			block = null;
 		}
 		else {
 			numBlocks = 1;
+			System.out.println("leaf numblocks: " + numBlocks);
 			left = null;
 			right = null;
 			block = leftList.get(0);
@@ -79,12 +108,13 @@ public class BlockTree {
 
 		if (rightList.size() > 1){
 			numBlocks = rightList.size();
-//			left = new BlockTree(leftList);
+			System.out.println("right numblocks: " + numBlocks);
 			right = new BlockTree(rightList);
 			block = null;
 		}
 		else {
 			numBlocks = 1;
+			System.out.println("leaf numblocks: " + numBlocks);
 			left = null;
 			right = null;
 			block = rightList.get(0);
@@ -124,12 +154,25 @@ public class BlockTree {
 	 */
 	public boolean contains(Vector2D p) {
 		// TODO: Implement me.
+		if ((this.left == null || this.right == null) && !this.isLeaf()) {
+			System.out.println("error");
+		}
 		if (this.isLeaf()) {
 			return p.x >= box.lower.x && p.x <= box.upper.x && p.y >= box.lower.y && p.y <= box.upper.y;
 		}
 		else {
 			if (p.x >= box.lower.x && p.x <= box.upper.x && p.y >= box.lower.y && p.y <= box.upper.y) {
-				return this.left.contains(p) || this.right.contains(p);
+				boolean leftRes = false;
+				if (this.left != null) {
+					leftRes = this.left.contains(p);
+				}
+
+				boolean rightRes = false;
+				if (this.right != null) {
+					rightRes = this.right.contains(p);
+				}
+
+				return rightRes || leftRes;
 			}
 			else { return false;}
 		}
@@ -148,15 +191,69 @@ public class BlockTree {
 	 */
 	public boolean overlaps(Vector2D thisD, BlockTree t, Vector2D d) {
 		// TODO: Implement me
-		this.box = this.box.displaced(thisD);
-		t.box = t.box.displaced(d);
+//		Vector2D newLower = new Vector2D(this.box.lower.x + thisD.x, this.box.lower.y + thisD.y);
+//		Vector2D newUpper = new Vector2D(this.box.upper.x + thisD.x, this.box.upper.y + thisD.y);
+		// BoundingBox thisBox = new BoundingBox(newLower, newUpper);
+		BoundingBox thisBox = this.box.displaced(thisD);
 
-		if (this.isLeaf()) {
-			return this.box.lower.x >= t.box.lower.x && this.box.upper.x <= t.box.upper.x && this.box.lower.y >= t.box.lower.y && this.box.upper.y <= t.box.upper.y;
+//		Vector2D newTLower = new Vector2D(t.box.lower.x + d.x, t.box.lower.y + d.y);
+//		Vector2D newTUpper = new Vector2D(t.box.upper.x + d.x, t.box.upper.y + d.y);
+		// BoundingBox tBox = new BoundingBox(newTLower, newTUpper);
+		BoundingBox tBox = t.box.displaced(d);
+
+		Vector2D upperLeft = new Vector2D(thisBox.lower.x, thisBox.lower.y);
+		Vector2D lowerLeft = new Vector2D(thisBox.lower.x, thisBox.upper.y);
+		Vector2D upperRight = new Vector2D(thisBox.upper.x, thisBox.lower.y);
+		Vector2D lowerRight = new Vector2D(thisBox.upper.x, thisBox.upper.y);
+
+		Vector2D upperTLeft = new Vector2D(tBox.lower.x, tBox.lower.y);
+		Vector2D lowerTLeft = new Vector2D(tBox.lower.x, tBox.upper.y);
+		Vector2D upperTRight = new Vector2D(tBox.upper.x, tBox.lower.y);
+		Vector2D lowerTRight = new Vector2D(tBox.upper.x, tBox.upper.y);
+
+//		Vector2D upperLeft = new Vector2D(thisBox.lower.y, thisBox.lower.x);
+//		Vector2D lowerLeft = new Vector2D(thisBox.lower.y, thisBox.upper.x);
+//		Vector2D upperRight = new Vector2D(thisBox.upper.y, thisBox.lower.x);
+//		Vector2D lowerRight = new Vector2D(thisBox.upper.y, thisBox.upper.x);
+//
+//		Vector2D upperTLeft = new Vector2D(tBox.lower.y, tBox.lower.x);
+//		Vector2D lowerTLeft = new Vector2D(tBox.lower.y, tBox.upper.x);
+//		Vector2D upperTRight = new Vector2D(tBox.upper.y, tBox.lower.x);
+//		Vector2D lowerTRight = new Vector2D(tBox.upper.y, tBox.upper.x);
+
+
+		if (this.isLeaf() || t.isLeaf()) {
+			return ((upperTLeft.x >= upperLeft.x && upperTRight.x <= upperRight.x && upperLeft.y >= upperTRight.y && lowerRight.y <= lowerTRight.y));
+			// return ((thisBox.contains(upperTLeft) || thisBox.contains(upperTRight) || thisBox.contains(lowerTLeft) || thisBox.contains(lowerTRight)));
+			// return thisBox.lower.x >= tBox.lower.x && thisBox.upper.x <= tBox.upper.x && thisBox.lower.y >= tBox.lower.y && thisBox.upper.y <= tBox.upper.y;
 		}
 		else {
-			if (this.box.lower.x >= t.box.lower.x && this.box.upper.x <= t.box.upper.x && this.box.lower.y >= t.box.lower.y && this.box.upper.y <= t.box.upper.y) {
-				return this.left.overlaps(thisD, t.left, d) || this.right.overlaps(thisD,t. right, d);
+			// if ((thisBox.contains(upperTLeft) || thisBox.contains(upperTRight) || thisBox.contains(lowerTLeft) || thisBox.contains(lowerTRight))) {
+			if ((upperTLeft.x >= upperLeft.x && upperTRight.x <= upperRight.x && upperLeft.y >= upperTRight.y && lowerRight.y <= lowerTRight.y)) {
+				boolean leftRight = false;
+				boolean leftLeft = false;
+				boolean rightLeft = false;
+				boolean rightRight = false;
+
+				if (this.left != null && t.left != null) {
+					leftLeft = this.left.overlaps(thisD, t.left, d);
+				}
+
+				if (this.left != null && t.right != null) {
+					leftRight = this.left.overlaps(thisD, t.right, d);
+				}
+
+				if (this.right != null && t.left != null) {
+					rightLeft = this.right.overlaps(thisD, t.left, d);
+				}
+
+				if (this.right != null && t.right != null) {
+					rightRight = this.right.overlaps(thisD, t.right, d);
+				}
+
+				return leftRight || leftLeft || rightLeft || rightRight;
+
+				// return this.left.overlaps(thisD, t.left, d) || this.left.overlaps(thisD, t.right, d) || this.right.overlaps(thisD, t.right, d) || this.right.overlaps(thisD, t.left, d);// || t.left.overlaps(d,this, thisD) || t.right.overlaps(d,this,thisD);
 			}
 			else { return false;}
 		}

@@ -134,8 +134,10 @@ MouseMotionListener {
         System.out.println("# shapes left = " + shapesLeft);
         shapes = new ArrayList<Shape>();
         for (HashSet<Block> s : parsedShapes) {
+            System.out.println("------------New Shape----------");
             shapes.add(new Shape(s));
         }
+
 
         // Default values.
         imgWidth = 1.0;
@@ -263,10 +265,12 @@ MouseMotionListener {
         Vector2D p = getCoords(e);
 
         // TODO: Find if a shape has been clicked on. Toggle the clickedOn flag of the shape.
-
+        System.out.println("Click: " + p.toString());
         // HINT: Repaint only if necessary!
         for (Shape s : shapes) {
+            System.out.println("Box: " + s.tree.getBox().toString());
             if (s.contains(p)) {
+
                 s.click();
                 repaint();
             }
@@ -291,8 +295,10 @@ MouseMotionListener {
         // reset
         selectedShape = null;
         selectedAt = null;
-
+        System.out.println("Click: " + p.toString());
         for (Shape s : shapes) {
+            System.out.println("Box: " + s.tree.getBox().toString());
+
             if (s.contains(p)) {
                 selectedShape = s;
                 selectedAt = p;
